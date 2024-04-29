@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
-import { ReactiveFormsModule } from '@angular/forms';
 
+// Correct the paths according to your actual folder structure
 import { AppComponent } from './app.component';
-import { AppVideoUploadComponent } from './components/app-video-upload/app-video-upload.component';
-import { AppTranscriptDisplayComponent } from './components/app-transcript-display/app-transcript-display.component';
-import { AppChapterCustomizationComponent } from './components/app-chapter-customization/app-chapter-customization.component';
+import { AppVideoUploadComponent } from './components/app-video-upload.component';
+import { AppTranscriptDisplayComponent } from './components/app-transcript-display.component';
+import { AppChapterCustomizationComponent } from './components/app-chapter-customization.component';
 
 import { VideoUploadService } from './services/video-upload.service';
 import { TranscriptDisplayService } from './services/transcript-display.service';
@@ -17,19 +17,14 @@ import { ChapterCustomizationService } from './services/chapter-customization.se
     AppComponent,
     AppVideoUploadComponent,
     AppTranscriptDisplayComponent,
-    AppChapterCustomizationComponent
+    AppChapterCustomizationComponent,
   ],
-  imports: [
-    BrowserModule,
-    HttpClientModule,
-    ReactiveFormsModule
-  ],
+  imports: [BrowserModule, HttpClientModule],
   providers: [
     VideoUploadService,
     TranscriptDisplayService,
-    ChapterCustomizationService
+    ChapterCustomizationService,
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
-
+export class AppModule {}
