@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Params } from '@angular/router';
 import { TranscriptDisplayService } from '../services/transcript-display.service';
 
 @Component({
@@ -8,40 +7,21 @@ import { TranscriptDisplayService } from '../services/transcript-display.service
   styleUrls: ['./app-transcript-display.component.scss'],
 })
 export class AppTranscriptDisplayComponent implements OnInit {
-  transcript = '';
   videoId: string = '';
+  transcript: string = '';
   error: string = '';
 
-  constructor(
-    private transcriptDisplayService: TranscriptDisplayService,
-    private route: ActivatedRoute,
-  ) {}
+  constructor(private transcriptService: TranscriptDisplayService) {}
 
   ngOnInit(): void {
-    // Check if the video ID is available in the route parameters
-    this.route.params.subscribe((params: Params) => {
-      this.videoId = params['videoId'];
-      if (this.videoId) {
-        // If the video ID is present, automatically fetch the transcript
-        this.displayTranscript();
-      }
-    });
+    this.videoId = '12345'; // Example video ID
+    this.loadTranscript();
   }
 
-  displayTranscript(): void {
-    if (!this.videoId) {
-      this.error = 'Video ID is required';
-      return;
-    }
-
-    this.transcriptDisplayService.getTranscript(this.videoId).subscribe(
-      (res) => {
-        this.transcript = res;
-        this.error = '';
-      },
-      (error) => {
-        this.error = error.message;
-      },
+  loadTranscript(): void {
+    this.transcriptService.getTranscript(this.videoId).subscribe(
+      (transcript) => (this.transcript = transcript),
+      (error) => (this.error = 'Failed to load transcript.'),
     );
   }
 }

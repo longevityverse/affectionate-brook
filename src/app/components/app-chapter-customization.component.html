@@ -1,0 +1,12 @@
+<div>
+    <h1>Chapter Customization</h1>
+    <div *ngIf="error">{{ error }}</div>
+    <ul *ngIf="chapters.length">
+      <li *ngFor="let chapter of chapters">
+        <input type="text" [(ngModel)]="chapter.title" placeholder="Chapter Title">
+        <input type="number" [(ngModel)]="chapter.startTime" placeholder="Start Time">
+      </li>
+    </ul>
+    <button (click)="saveChapters()" [disabled]="!chapters.length">Save Chapters</button>
+  </div>
+  

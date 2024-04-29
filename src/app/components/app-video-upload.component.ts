@@ -1,79 +1,31 @@
-import {
-  Component,
-  OnInit,
-  ChangeDetectorRef,
-  ViewChild,
-  ElementRef,
-} from '@angular/core';
-import { HttpClient, HttpEventType } from '@angular/common/http';
-import { Observable, fromEvent, Subject } from 'rxjs';
-import { debounceTime, map, catchError } from 'rxjs/operators';
+import { Component } from '@angular/core';
+import { VideoUploadService } from '../services/video-upload.service';
 
 @Component({
   selector: 'app-video-upload',
   templateUrl: './app-video-upload.component.html',
   styleUrls: ['./app-video-upload.component.scss'],
 })
-export class AppVideoUploadComponent implements OnInit {
-  @ViewChild('videoInput') videoInput: ElementRef;
-  @ViewChild('progressBar') progressBar: ElementRef;
+export class AppVideoUploadComponent {
+  videoFile: File | null = null;
   uploadProgress: number = 0;
   error: string = '';
-  videoId: string = '';
 
-  constructor(
-    private http: HttpClient,
-    private changeDetectorRef: ChangeDetectorRef,
-  ) {}
+  constructor(private uploadService: VideoUploadService) {}
 
-  ngOnInit(): void {
-    // Implement any initialization logic here
-  }
-
-  onFileChange(event: Event) {
-    const fileInput = event.target as HTMLInputElement;
-    const file = fileInput.files[0];
-
-    if (file) {
-      const formData = new FormData();
-      formData.append('video', file);
-
-      this.http
-        .post('/api/videos', formData, {
-          observe: 'events',
-          reportProgress: true,
-        })
-        .subscribe(
-          (event) => {
-            if (event.type === HttpEventType.UploadProgress) {
-              const progress = Math.round((event.loaded / event.total) * 100);
-              this.uploadProgress = progress;
-              this.changeDetectorRef.detectChanges();
-            } else if (event.type === HttpEventType.Response) {
-              this.videoId = event.body.videoId;
-              this.error = '';
-              this.changeDetectorRef.detectChanges();
-            }
-          },
-          (error) => {
-            this.uploadProgress = 0;
-            this.error = error.message;
-            this.changeDetectorRef.detectChanges();
-          },
-        );
+  onFileSelected(event: any): void {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      this.videoFile = files[0];
     }
   }
 
-  generateChapters() {
-    this.http.post(`/api/videos/${this.videoId}/chapters`, {}).subscribe(
-      (response: any) => {
-        // Handle the response containing the generated chapters
-        console.log('Generated Chapters:', response.chapters);
-      },
-      (error) => {
-        this.error = error.message;
-        this.changeDetectorRef.detectChanges();
-      },
-    );
+  uploadVideo(): void {
+    if (this.videoFile) {
+      this.uploadService.uploadVideo(this.videoFile).subscribe(
+        (progress) => (this.uploadProgress = progress),
+        (error) => (this.error = 'Failed to upload video.'),
+      );
+    }
   }
 }
