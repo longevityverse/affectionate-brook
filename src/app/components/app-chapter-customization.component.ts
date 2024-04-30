@@ -1,55 +1,58 @@
 import { Component, OnInit } from '@angular/core';
-import { ChapterCustomizationService } from '../services/chapter-customization.service';
-
-interface Chapter {
-  title: string;
-  startTime: number;
-}
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-chapter-customization',
   templateUrl: './app-chapter-customization.component.html',
-  styleUrls: ['./app-chapter-customization.component.scss'],
+  styleUrls: ['./app-chapter-customization.component.css'],
 })
 export class AppChapterCustomizationComponent implements OnInit {
-  videoId: string = '';
-  chapters: Chapter[] = [];
-  error: string = '';
+  chapterForm = new FormGroup({
+    title: new FormControl('', [
+      Validators.required,
+      Validators.minLength(2),
+      Validators.maxLength(50),
+      this.validateChapterTitle,
+    ]),
+    start_time: new FormControl('', [
+      Validators.required,
+      Validators.pattern(/^([0-9]{2}):([0-9]{2}):([0-9]{2})$/),
+    ]),
+    end_time: new FormControl('', [
+      Validators.required,
+      Validators.pattern(/^([0-9]{2}):([0-9]{2}):([0-9]{2})$/),
+      this.validateStartEndTime.bind(this),
+    ]),
+    video_id: new FormControl('', [
+      Validators.required,
+      Validators.pattern(/^[a-zA-Z0-9_-]+$/),
+    ]),
+  });
 
-  constructor(private chapterService: ChapterCustomizationService) {}
+  ngOnInit(): void {}
 
-  ngOnInit(): void {
-    // Assume videoId is retrieved from a source like route params
-    this.videoId = '12345'; // Placeholder for actual video ID retrieval logic
-
-    if (this.videoId) {
-      this.loadChapters();
+  submitForm(): void {
+    if (this.chapterForm.valid) {
+      console.log('Form is valid:', this.chapterForm.value);
+    } else {
+      console.log('Form is invalid');
     }
   }
 
-  loadChapters(): void {
-    this.chapterService.getChapters(this.videoId).subscribe(
-      (chapters) => {
-        this.chapters = chapters;
-        this.error = '';
-      },
-      (error) => {
-        this.error = 'Failed to load chapters. Please try again.';
-        console.error(error);
-      },
-    );
+  validateChapterTitle(control: FormControl): { [key: string]: any } | null {
+    const allowedCharacters = /^[a-zA-Z0-9_ ]+$/;
+    if (control.value && !allowedCharacters.test(control.value)) {
+      return { validateChapterTitle: true };
+    }
+    return null;
   }
 
-  saveChapters(): void {
-    this.chapterService.saveChapters(this.videoId, this.chapters).subscribe(
-      () => {
-        this.error = '';
-        alert('Chapters saved successfully.');
-      },
-      (error) => {
-        this.error = 'Failed to save chapters. Please try again.';
-        console.error(error);
-      },
-    );
+  validateStartEndTime(control: FormControl): { [key: string]: any } | null {
+    const startTime = this.chapterForm.get('start_time')?.value;
+    const endTime = control.value;
+    if (startTime && endTime && endTime <= startTime) {
+      return { invalidEndTime: true };
+    }
+    return null;
   }
 }

@@ -1,12 +1,43 @@
-<div>
-    <h1>Chapter Customization</h1>
-    <div *ngIf="error">{{ error }}</div>
-    <ul *ngIf="chapters.length">
-      <li *ngFor="let chapter of chapters">
-        <input type="text" [(ngModel)]="chapter.title" placeholder="Chapter Title">
-        <input type="number" [(ngModel)]="chapter.startTime" placeholder="Start Time">
-      </li>
-    </ul>
-    <button (click)="saveChapters()" [disabled]="!chapters.length">Save Chapters</button>
-  </div>
+<form [formGroup]="chapterForm" (ngSubmit)="submitForm()">
+    <div>
+      <label>Chapter Title:</label>
+      <input type="text" formControlName="title">
+      <div *ngIf="chapterForm.get('title').errors && (chapterForm.get('title').dirty || chapterForm.get('title').touched)">
+        <div *ngIf="chapterForm.get('title').errors.required">Chapter title is required</div>
+        <div *ngIf="chapterForm.get('title').errors.minlength">Chapter title must be at least 2 characters long</div>
+        <div *ngIf="chapterForm.get('title').errors.maxlength">Chapter title must be at most 50 characters long</div>
+        <div *ngIf="chapterForm.get('title').errors.validateChapterTitle">Chapter title contains invalid characters</div>
+      </div>
+    </div>
+  
+    <div>
+      <label>Start Time:</label>
+      <input type="text" formControlName="start_time">
+      <div *ngIf="chapterForm.get('start_time').errors && (chapterForm.get('start_time').dirty || chapterForm.get('start_time').touched)">
+        <div *ngIf="chapterForm.get('start_time').errors.required">Start time is required</div>
+        <div *ngIf="chapterForm.get('start_time').errors.pattern">Start time must be in the format HH:mm:ss</div>
+      </div>
+    </div>
+  
+    <div>
+      <label>End Time:</label>
+      <input type="text" formControlName="end_time">
+      <div *ngIf="chapterForm.get('end_time').errors && (chapterForm.get('end_time').dirty || chapterForm.get('end_time').touched)">
+        <div *ngIf="chapterForm.get('end_time').errors.required">End time is required</div>
+        <div *ngIf="chapterForm.get('end_time').errors.pattern">End time must be in the format HH:mm:ss</div>
+        <div *ngIf="chapterForm.get('end_time').errors.invalidEndTime">End time must be after start time</div>
+      </div>
+    </div>
+  
+    <div>
+      <label>Video ID:</label>
+      <input type="text" formControlName="video_id">
+      <div *ngIf="chapterForm.get('video_id').errors && (chapterForm.get('video_id').dirty || chapterForm.get('video_id').touched)">
+        <div *ngIf="chapterForm.get('video_id').errors.required">Video ID is required</div>
+        <div *ngIf="chapterForm.get('video_id').errors.pattern">Video ID must be alphanumeric and contain only allowed characters</div>
+      </div>
+    </div>
+  
+    <button type="submit">Submit</button>
+  </form>
   
