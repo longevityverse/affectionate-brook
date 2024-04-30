@@ -2,7 +2,10 @@
     <h1>Video Upload</h1>
     <input type="file" (change)="onFileSelected($event)" accept="video/*">
     <button (click)="uploadVideo()" [disabled]="!videoFile">Upload Video</button>
-    <div *ngIf="uploadProgress">{{ uploadProgress }}%</div>
+    <div *ngIf="uploadProgress > 0">
+      <progress value="{{ uploadProgress }}" max="100"></progress>
+      {{ uploadProgress }}%
+    </div>
     <div *ngIf="error">{{ error }}</div>
   </div>
   
